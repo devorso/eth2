@@ -335,6 +335,7 @@ func (s *skeleton) Sync(head *types.Header, final *types.Header, force bool) err
 	log.Trace("New skeleton head announced", "number", head.Number, "hash", head.Hash(), "force", force)
 	errc := make(chan error)
 
+	log.Info("SYNCING...")
 	select {
 	case s.headEvents <- &headUpdate{header: head, final: final, force: force, errc: errc}:
 		return <-errc
