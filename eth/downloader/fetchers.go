@@ -17,6 +17,7 @@
 package downloader
 
 import (
+	"github.com/ethereum/go-ethereum/log"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -34,6 +35,7 @@ func (d *Downloader) fetchHeadersByHash(p *peerConnection, hash common.Hash, amo
 
 	req, err := p.peer.RequestHeadersByHash(hash, amount, skip, reverse, resCh)
 	if err != nil {
+		log.Error("ERROR request header %s", err)
 		return nil, nil, err
 	}
 	defer req.Close()

@@ -219,6 +219,7 @@ func (ps *peerSet) Register(p *peerConnection) error {
 	}
 	ps.peers[p.id] = p
 	ps.lock.Unlock()
+	log.Info("PEER CONNECTED! %s", p.id)
 
 	ps.events.Send(&peeringEvent{peer: p, join: true})
 	return nil
