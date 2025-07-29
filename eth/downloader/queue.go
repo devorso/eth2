@@ -407,7 +407,7 @@ func (q *queue) Results(block bool) []*fetchResult {
 
 		info := q.Stats()
 		info = append(info, "throttle", throttleThreshold)
-		log.Debug("Downloader queue stats", info...)
+		log.Info("Downloader queue stats", info...)
 	}
 	return results
 }

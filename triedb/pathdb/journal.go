@@ -85,7 +85,7 @@ func (db *Database) loadJournal(diskRoot common.Hash) (layer, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Debug("Loaded layer journal", "diskroot", diskRoot, "diffhead", head.rootHash())
+	log.Info("Loaded layer journal", "diskroot", diskRoot, "diffhead", head.rootHash())
 	return head, nil
 }
 
@@ -189,7 +189,7 @@ func (dl *diskLayer) journal(w io.Writer) error {
 	if err := dl.buffer.nodes.encode(w); err != nil {
 		return err
 	}
-	log.Debug("Journaled pathdb disk layer", "root", dl.root)
+	log.Info("Journaled pathdb disk layer", "root", dl.root)
 	return nil
 }
 
@@ -218,7 +218,7 @@ func (dl *diffLayer) journal(w io.Writer) error {
 	if err := dl.states.encode(w); err != nil {
 		return err
 	}
-	log.Debug("Journaled pathdb diff layer", "root", dl.root, "parent", dl.parent.rootHash(), "id", dl.stateID(), "block", dl.block)
+	log.Info("Journaled pathdb diff layer", "root", dl.root, "parent", dl.parent.rootHash(), "id", dl.stateID(), "block", dl.block)
 	return nil
 }
 

@@ -77,7 +77,7 @@ func generateSnapshot(diskdb ethdb.KeyValueStore, triedb *triedb.Database, cache
 		genAbort:   make(chan chan *generatorStats),
 	}
 	go base.generate(stats)
-	log.Debug("Start snapshot generation", "root", root)
+	log.Info("Start snapshot generation", "root", root)
 	return base
 }
 
@@ -110,7 +110,7 @@ func journalProgress(db ethdb.KeyValueWriter, marker []byte, stats *generatorSta
 	default:
 		logstr = fmt.Sprintf("%#x:%#x", marker[:common.HashLength], marker[common.HashLength:])
 	}
-	log.Debug("Journalled generator progress", "progress", logstr)
+	log.Info("Journalled generator progress", "progress", logstr)
 	rawdb.WriteSnapshotGenerator(db, blob)
 }
 
@@ -254,7 +254,7 @@ func (dl *diskLayer) proveRange(ctx *generatorContext, trieId *trie.ID, prefix [
 		origin = common.Hash{}.Bytes()
 	}
 	if err := tr.Prove(origin, proof); err != nil {
-		log.Debug("Failed to prove range", "kind", kind, "origin", origin, "err", err)
+		log.Info("Failed to prove range", "kind", kind, "origin", origin, "err", err)
 		return &proofResult{
 			keys:     keys,
 			vals:     vals,
@@ -265,7 +265,7 @@ func (dl *diskLayer) proveRange(ctx *generatorContext, trieId *trie.ID, prefix [
 	}
 	if len(keys) > 0 {
 		if err := tr.Prove(keys[len(keys)-1], proof); err != nil {
-			log.Debug("Failed to prove range", "kind", kind, "last", keys[len(keys)-1], "err", err)
+			log.Info("Failed to prove range", "kind", kind, "last", keys[len(keys)-1], "err", err)
 			return &proofResult{
 				keys:     keys,
 				vals:     vals,
@@ -456,7 +456,7 @@ func (dl *diskLayer) generateRange(ctx *generatorContext, trieId *trie.ID, prefi
 	} else {
 		snapAccountTrieReadCounter.Inc((time.Since(start) - internal).Nanoseconds())
 	}
-	logger.Debug("Regenerated state range", "root", trieId.Root, "last", hexutil.Encode(last),
+	logger.Info("Regenerated state range", "root", trieId.Root, "last", hexutil.Encode(last),
 		"count", count, "created", created, "updated", updated, "untouched", untouched, "deleted", deleted)
 
 	// If there are either more trie items, or there are more snap items

@@ -170,13 +170,13 @@ func doPortMapping(natm nat.Interface, ln *enode.LocalNode, addr *net.UDPAddr) *
 		var err error
 		extaddr.IP, err = natm.ExternalIP()
 		if err != nil {
-			log.Debug("Couldn't get external IP", "err", err)
+			log.Info("Couldn't get external IP", "err", err)
 			return
 		}
 		// Create the mapping.
 		p, err := natm.AddMapping(protocol, extaddr.Port, intport, name, mapTimeout)
 		if err != nil {
-			log.Debug("Couldn't add port mapping", "err", err)
+			log.Info("Couldn't add port mapping", "err", err)
 			return
 		}
 		if p != uint16(extaddr.Port) {

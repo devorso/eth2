@@ -696,7 +696,7 @@ func (bc *BlockChain) rewindHashHead(head *types.Header, root common.Hash) (*typ
 			log.Info("Rewound to block with state", "number", head.Number, "hash", head.Hash())
 			return head, rootNumber
 		}
-		log.Debug("Skipping block with threshold state", "number", head.Number, "hash", head.Hash(), "root", head.Root)
+		log.Info("Skipping block with threshold state", "number", head.Number, "hash", head.Hash(), "root", head.Root)
 		head = bc.GetHeader(head.ParentHash, head.Number.Uint64()-1) // Keep rewinding
 	}
 }
@@ -1410,7 +1410,7 @@ func (bc *BlockChain) InsertReceiptChain(blockChain types.Blocks, receiptChain [
 	if stats.ignored > 0 {
 		context = append(context, []interface{}{"ignored", stats.ignored}...)
 	}
-	log.Debug("Imported new block receipts", context...)
+	log.Info("Imported new block receipts", context...)
 
 	return 0, nil
 }
@@ -1652,7 +1652,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, setHead bool, makeWitness 
 			if block.NumberU64() > current.Number.Uint64() || bc.GetCanonicalHash(block.NumberU64()) != block.Hash() {
 				break
 			}
-			log.Debug("Ignoring already known block", "number", block.Number(), "hash", block.Hash())
+			log.Info("Ignoring already known block", "number", block.Number(), "hash", block.Hash())
 			stats.ignored++
 
 			block, err = it.next()
@@ -1666,7 +1666,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, setHead bool, makeWitness 
 		// `insertChain` while a part of them have higher total difficulty than current
 		// head full block(new pivot point).
 		for block != nil && bc.skipBlock(err, it) {
-			log.Debug("Writing previously known block", "number", block.Number(), "hash", block.Hash())
+			log.Info("Writing previously known block", "number", block.Number(), "hash", block.Hash())
 			if err := bc.writeKnownBlock(block); err != nil {
 				return nil, it.index, err
 			}
@@ -1681,11 +1681,11 @@ func (bc *BlockChain) insertChain(chain types.Blocks, setHead bool, makeWitness 
 	case errors.Is(err, consensus.ErrPrunedAncestor):
 		if setHead {
 			// First block is pruned, insert as sidechain and reorg only if TD grows enough
-			log.Debug("Pruned ancestor, inserting as sidechain", "number", block.Number(), "hash", block.Hash())
+			log.Info("Pruned ancestor, inserting as sidechain", "number", block.Number(), "hash", block.Hash())
 			return bc.insertSideChain(block, it, makeWitness)
 		} else {
 			// We're post-merge and the parent is pruned, try to recover the parent state
-			log.Debug("Pruned ancestor", "number", block.Number(), "hash", block.Hash())
+			log.Info("Pruned ancestor", "number", block.Number(), "hash", block.Hash())
 			_, err := bc.recoverAncestors(block, makeWitness)
 			return nil, it.index, err
 		}
@@ -1715,7 +1715,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, setHead bool, makeWitness 
 	for ; block != nil && err == nil || errors.Is(err, ErrKnownBlock); block, err = it.next() {
 		// If the chain is terminating, stop processing blocks
 		if bc.insertStopped() {
-			log.Debug("Abort during block processing")
+			log.Info("Abort during block processing")
 			break
 		}
 		// If the block is known (in the middle of the chain), it's a special case for
@@ -1838,7 +1838,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, setHead bool, makeWitness 
 		}
 		switch res.status {
 		case CanonStatTy:
-			log.Debug("Inserted new block", "number", block.Number(), "hash", block.Hash(),
+			log.Info("Inserted new block", "number", block.Number(), "hash", block.Hash(),
 				"uncles", len(block.Uncles()), "txs", len(block.Transactions()), "gas", block.GasUsed(),
 				"elapsed", common.PrettyDuration(time.Since(start)),
 				"root", block.Root())
@@ -1849,7 +1849,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks, setHead bool, makeWitness 
 			bc.gcproc += res.procTime
 
 		case SideStatTy:
-			log.Debug("Inserted forked block", "number", block.Number(), "hash", block.Hash(),
+			log.Info("Inserted forked block", "number", block.Number(), "hash", block.Hash(),
 				"diff", block.Difficulty(), "elapsed", common.PrettyDuration(time.Since(start)),
 				"txs", len(block.Transactions()), "gas", block.GasUsed(), "uncles", len(block.Uncles()),
 				"root", block.Root())
@@ -2040,7 +2040,7 @@ func (bc *BlockChain) insertSideChain(block *types.Block, it *insertIterator, ma
 			if err := bc.writeBlockWithoutState(block, externTd); err != nil {
 				return nil, it.index, err
 			}
-			log.Debug("Injected sidechain block", "number", block.Number(), "hash", block.Hash(),
+			log.Info("Injected sidechain block", "number", block.Number(), "hash", block.Hash(),
 				"diff", block.Difficulty(), "elapsed", common.PrettyDuration(time.Since(start)),
 				"txs", len(block.Transactions()), "gas", block.GasUsed(), "uncles", len(block.Uncles()),
 				"root", block.Root())
@@ -2091,7 +2091,7 @@ func (bc *BlockChain) insertSideChain(block *types.Block, it *insertIterator, ma
 
 			// If the chain is terminating, stop processing blocks
 			if bc.insertStopped() {
-				log.Debug("Abort during blocks processing")
+				log.Info("Abort during blocks processing")
 				return nil, 0, nil
 			}
 		}
@@ -2127,7 +2127,7 @@ func (bc *BlockChain) recoverAncestors(block *types.Block, makeWitness bool) (co
 
 		// If the chain is terminating, stop iteration
 		if bc.insertStopped() {
-			log.Debug("Abort during blocks iteration")
+			log.Info("Abort during blocks iteration")
 			return common.Hash{}, errInsertionInterrupted
 		}
 	}
@@ -2138,7 +2138,7 @@ func (bc *BlockChain) recoverAncestors(block *types.Block, makeWitness bool) (co
 	for i := len(hashes) - 1; i >= 0; i-- {
 		// If the chain is terminating, stop processing blocks
 		if bc.insertStopped() {
-			log.Debug("Abort during blocks processing")
+			log.Info("Abort during blocks processing")
 			return common.Hash{}, errInsertionInterrupted
 		}
 		var b *types.Block

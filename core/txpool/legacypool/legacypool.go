@@ -364,7 +364,7 @@ func (pool *LegacyPool) loop() {
 			stales := int(pool.priced.stales.Load())
 
 			if pending != prevPending || queued != prevQueued || stales != prevStales {
-				log.Debug("Transaction pool status report", "executable", pending, "queued", queued, "stales", stales)
+				log.Info("Transaction pool status report", "executable", pending, "queued", queued, "stales", stales)
 				prevPending, prevQueued, prevStales = pending, queued, stales
 			}
 
@@ -1357,7 +1357,7 @@ func (pool *LegacyPool) reset(oldHead, newHead *types.Header) {
 		newNum := newHead.Number.Uint64()
 
 		if depth := uint64(math.Abs(float64(oldNum) - float64(newNum))); depth > 64 {
-			log.Debug("Skipping deep transaction reorg", "depth", depth)
+			log.Info("Skipping deep transaction reorg", "depth", depth)
 		} else {
 			// Reorg seems shallow enough to pull in all transactions into memory
 			var (
@@ -1376,7 +1376,7 @@ func (pool *LegacyPool) reset(oldHead, newHead *types.Header) {
 					return
 				}
 				// If the reorg ended up on a lower number, it's indicative of setHead being the cause
-				log.Debug("Skipping transaction reset caused by setHead",
+				log.Info("Skipping transaction reset caused by setHead",
 					"old", oldHead.Hash(), "oldnum", oldNum, "new", newHead.Hash(), "newnum", newNum)
 				// We still need to update the current state s.th. the lost transactions can be readded by the user
 			} else {
@@ -1439,7 +1439,7 @@ func (pool *LegacyPool) reset(oldHead, newHead *types.Header) {
 	pool.pendingNonces = newNoncer(statedb)
 
 	// Inject any transactions discarded due to reorgs
-	log.Debug("Reinjecting stale transactions", "count", len(reinject))
+	log.Info("Reinjecting stale transactions", "count", len(reinject))
 	core.SenderCacher.Recover(pool.signer, reinject)
 	pool.addTxsLocked(reinject, false)
 }

@@ -517,14 +517,14 @@ func (t *dialTask) resolve(d *dialScheduler) bool {
 		if t.resolveDelay > maxResolveDelay {
 			t.resolveDelay = maxResolveDelay
 		}
-		d.log.Debug("Resolving node failed", "id", node.ID(), "newdelay", t.resolveDelay)
+		d.log.Info("Resolving node failed", "id", node.ID(), "newdelay", t.resolveDelay)
 		return false
 	}
 	// The node was found.
 	t.resolveDelay = initialResolveDelay
 	t.destPtr.Store(resolved)
 	resAddr, _ := resolved.TCPEndpoint()
-	d.log.Debug("Resolved node", "id", resolved.ID(), "addr", resAddr)
+	d.log.Info("Resolved node", "id", resolved.ID(), "addr", resAddr)
 	return true
 }
 

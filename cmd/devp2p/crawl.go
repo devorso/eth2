@@ -194,7 +194,7 @@ func (c *crawler) updateNode(n *enode.Node) int {
 	if nn, err := c.disc.RequestENR(n); err != nil {
 		if node.Score == 0 {
 			// Node doesn't implement EIP-868.
-			log.Debug("Skipping node", "id", n.ID())
+			log.Info("Skipping node", "id", n.ID())
 			return nodeSkipIncompat
 		}
 		node.Score /= 2
@@ -212,11 +212,11 @@ func (c *crawler) updateNode(n *enode.Node) int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if node.Score <= 0 {
-		log.Debug("Removing node", "id", n.ID())
+		log.Info("Removing node", "id", n.ID())
 		delete(c.output, n.ID())
 		return nodeRemoved
 	}
-	log.Debug("Updating node", "id", n.ID(), "seq", n.Seq(), "score", node.Score)
+	log.Info("Updating node", "id", n.ID(), "seq", n.Seq(), "score", node.Score)
 	c.output[n.ID()] = node
 	return status
 }

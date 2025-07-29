@@ -293,13 +293,13 @@ func (s *serverWithLimits) eventCallback(event Event) {
 		if s.parallelLimit < minParallelLimit {
 			s.parallelLimit = minParallelLimit
 		}
-		log.Debug("Server timeout", "count", s.timeoutCount, "parallelLimit", s.parallelLimit)
+		log.Info("Server timeout", "count", s.timeoutCount, "parallelLimit", s.parallelLimit)
 	case EvResponse, EvFail:
 		id := event.Data.(RequestResponse).ID
 		if _, ok := s.softTimeouts[id]; ok {
 			delete(s.softTimeouts, id)
 			s.timeoutCount--
-			log.Debug("Server timeout finalized", "count", s.timeoutCount, "parallelLimit", s.parallelLimit)
+			log.Info("Server timeout finalized", "count", s.timeoutCount, "parallelLimit", s.parallelLimit)
 		}
 		if event.Type == EvResponse && s.pendingCount >= int(s.parallelLimit) {
 			s.parallelLimit += parallelAdjustUp
@@ -406,9 +406,9 @@ func (s *serverWithLimits) delay(delay time.Duration) {
 
 	s.delayCounter++
 	delayCounter := s.delayCounter
-	log.Debug("Server delay started", "length", delay)
+	log.Info("Server delay started", "length", delay)
 	s.delayTimer = s.clock.AfterFunc(delay, func() {
-		log.Debug("Server delay ended", "length", delay)
+		log.Info("Server delay ended", "length", delay)
 		var sendCanRequestAgain bool
 		s.lock.Lock()
 		if s.delayTimer != nil && s.delayCounter == delayCounter { // do nothing if there is a new timer now
@@ -437,7 +437,7 @@ func (s *serverWithLimits) fail(desc string) {
 
 // failLocked calculates the dynamic failure delay and applies it.
 func (s *serverWithLimits) failLocked(desc string) {
-	log.Debug("Server error", "description", desc)
+	log.Info("Server error", "description", desc)
 	s.failureDelay *= 2
 	now := s.clock.Now()
 	if now > s.failureDelayEnd {

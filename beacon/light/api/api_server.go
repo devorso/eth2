@@ -43,15 +43,15 @@ func (s *ApiServer) Subscribe(eventCallback func(event request.Event)) {
 	s.eventCallback = eventCallback
 	listener := HeadEventListener{
 		OnNewHead: func(slot uint64, blockRoot common.Hash) {
-			log.Debug("New head received", "slot", slot, "blockRoot", blockRoot)
+			log.Info("New head received", "slot", slot, "blockRoot", blockRoot)
 			eventCallback(request.Event{Type: sync.EvNewHead, Data: types.HeadInfo{Slot: slot, BlockRoot: blockRoot}})
 		},
 		OnOptimistic: func(update types.OptimisticUpdate) {
-			log.Debug("New optimistic update received", "slot", update.Attested.Slot, "blockRoot", update.Attested.Hash(), "signerCount", update.Signature.SignerCount())
+			log.Info("New optimistic update received", "slot", update.Attested.Slot, "blockRoot", update.Attested.Hash(), "signerCount", update.Signature.SignerCount())
 			eventCallback(request.Event{Type: sync.EvNewOptimisticUpdate, Data: update})
 		},
 		OnFinality: func(update types.FinalityUpdate) {
-			log.Debug("New finality update received", "slot", update.Attested.Slot, "blockRoot", update.Attested.Hash(), "signerCount", update.Signature.SignerCount())
+			log.Info("New finality update received", "slot", update.Attested.Slot, "blockRoot", update.Attested.Hash(), "signerCount", update.Signature.SignerCount())
 			eventCallback(request.Event{Type: sync.EvNewFinalityUpdate, Data: update})
 		},
 		OnError: func(err error) {
@@ -68,23 +68,23 @@ func (s *ApiServer) SendRequest(id request.ID, req request.Request) {
 		var err error
 		switch data := req.(type) {
 		case sync.ReqUpdates:
-			log.Debug("Beacon API: requesting light client update", "reqid", id, "period", data.FirstPeriod, "count", data.Count)
+			log.Info("Beacon API: requesting light client update", "reqid", id, "period", data.FirstPeriod, "count", data.Count)
 			var r sync.RespUpdates
 			r.Updates, r.Committees, err = s.api.GetBestUpdatesAndCommittees(data.FirstPeriod, data.Count)
 			resp = r
 		case sync.ReqHeader:
 			var r sync.RespHeader
-			log.Debug("Beacon API: requesting header", "reqid", id, "hash", common.Hash(data))
+			log.Info("Beacon API: requesting header", "reqid", id, "hash", common.Hash(data))
 			r.Header, r.Canonical, r.Finalized, err = s.api.GetHeader(common.Hash(data))
 			resp = r
 		case sync.ReqCheckpointData:
-			log.Debug("Beacon API: requesting checkpoint data", "reqid", id, "hash", common.Hash(data))
+			log.Info("Beacon API: requesting checkpoint data", "reqid", id, "hash", common.Hash(data))
 			resp, err = s.api.GetCheckpointData(common.Hash(data))
 		case sync.ReqBeaconBlock:
-			log.Debug("Beacon API: requesting block", "reqid", id, "hash", common.Hash(data))
+			log.Info("Beacon API: requesting block", "reqid", id, "hash", common.Hash(data))
 			resp, err = s.api.GetBeaconBlock(common.Hash(data))
 		case sync.ReqFinality:
-			log.Debug("Beacon API: requesting finality update")
+			log.Info("Beacon API: requesting finality update")
 			resp, err = s.api.GetFinalityUpdate()
 		default:
 		}
@@ -93,7 +93,7 @@ func (s *ApiServer) SendRequest(id request.ID, req request.Request) {
 			log.Warn("Beacon API request failed", "type", reflect.TypeOf(req), "reqid", id, "err", err)
 			s.eventCallback(request.Event{Type: request.EvFail, Data: request.RequestResponse{ID: id, Request: req}})
 		} else {
-			log.Debug("Beacon API request answered", "type", reflect.TypeOf(req), "reqid", id)
+			log.Info("Beacon API request answered", "type", reflect.TypeOf(req), "reqid", id)
 			s.eventCallback(request.Event{Type: request.EvResponse, Data: request.RequestResponse{ID: id, Request: req, Response: resp}})
 		}
 	}()

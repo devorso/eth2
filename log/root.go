@@ -48,9 +48,9 @@ func Trace(msg string, ctx ...interface{}) {
 //
 // # Usage Examples
 //
-//	log.Debug("msg")
-//	log.Debug("msg", "key1", val1)
-//	log.Debug("msg", "key1", val1, "key2", val2)
+//	log.Info("msg")
+//	log.Info("msg", "key1", val1)
+//	log.Info("msg", "key1", val1, "key2", val2)
 func Debug(msg string, ctx ...interface{}) {
 	Root().Write(slog.LevelDebug, msg, ctx...)
 }

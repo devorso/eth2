@@ -470,21 +470,21 @@ func (api *BeaconLightApi) StartHeadListener(listener HeadEventListener) func() 
 			log.Trace("Retrieved initial head header", "slot", head.Slot, "hash", head.Hash())
 			listener.OnNewHead(head.Slot, head.Hash())
 		} else {
-			log.Debug("Failed to retrieve initial head header", "error", err)
+			log.Info("Failed to retrieve initial head header", "error", err)
 		}
 		log.Trace("Requesting initial optimistic update")
 		if optimisticUpdate, err := api.GetOptimisticUpdate(); err == nil {
 			log.Trace("Retrieved initial optimistic update", "slot", optimisticUpdate.Attested.Slot, "hash", optimisticUpdate.Attested.Hash())
 			listener.OnOptimistic(optimisticUpdate)
 		} else {
-			log.Debug("Failed to retrieve initial optimistic update", "error", err)
+			log.Info("Failed to retrieve initial optimistic update", "error", err)
 		}
 		log.Trace("Requesting initial finality update")
 		if finalityUpdate, err := api.GetFinalityUpdate(); err == nil {
 			log.Trace("Retrieved initial finality update", "slot", finalityUpdate.Finalized.Slot, "hash", finalityUpdate.Finalized.Hash())
 			listener.OnFinality(finalityUpdate)
 		} else {
-			log.Debug("Failed to retrieve initial finality update", "error", err)
+			log.Info("Failed to retrieve initial finality update", "error", err)
 		}
 
 		log.Trace("Starting event stream processing loop")

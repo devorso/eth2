@@ -54,7 +54,7 @@ func TestJSONHandler(t *testing.T) {
 	out := new(bytes.Buffer)
 	handler := JSONHandler(out)
 	logger := slog.New(handler)
-	logger.Debug("hi there")
+	logger.Info("hi there")
 	if len(out.String()) == 0 {
 		t.Error("expected non-empty debug log output from default JSON Handler")
 	}
@@ -62,7 +62,7 @@ func TestJSONHandler(t *testing.T) {
 	out.Reset()
 	handler = JSONHandlerWithLevel(out, slog.LevelInfo)
 	logger = slog.New(handler)
-	logger.Debug("hi there")
+	logger.Info("hi there")
 	if len(out.String()) != 0 {
 		t.Errorf("expected empty debug log output, but got: %v", out.String())
 	}

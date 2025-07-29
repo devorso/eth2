@@ -237,7 +237,7 @@ func (hc *HeaderChain) WriteHeaders(headers []*types.Header) (int, error) {
 	}
 	// Skip the slow disk write of all headers if interrupted.
 	if hc.procInterrupt() {
-		log.Debug("Premature abort during headers import")
+		log.Info("Premature abort during headers import")
 		return 0, errors.New("aborted")
 	}
 	// Commit to disk!
@@ -305,7 +305,7 @@ func (hc *HeaderChain) ValidateHeaderChain(chain []*types.Header) (int, error) {
 	for i := range chain {
 		// If the chain is terminating, stop processing blocks
 		if hc.procInterrupt() {
-			log.Debug("Premature abort during headers verification")
+			log.Info("Premature abort during headers verification")
 			return 0, errors.New("aborted")
 		}
 		// Otherwise wait for headers checks and ensure they pass
@@ -349,7 +349,7 @@ func (hc *HeaderChain) InsertHeaderChain(chain []*types.Header, start time.Time)
 	if res.ignored > 0 {
 		context = append(context, []interface{}{"ignored", res.ignored}...)
 	}
-	log.Debug("Imported new block headers", context...)
+	log.Info("Imported new block headers", context...)
 	return res.status, err
 }
 

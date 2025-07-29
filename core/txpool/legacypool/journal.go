@@ -83,7 +83,7 @@ func (journal *journal) load(add func([]*types.Transaction) []error) error {
 	loadBatch := func(txs types.Transactions) {
 		for _, err := range add(txs) {
 			if err != nil {
-				log.Debug("Failed to add journaled transaction", "err", err)
+				log.Info("Failed to add journaled transaction", "err", err)
 				dropped++
 			}
 		}

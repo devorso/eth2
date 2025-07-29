@@ -1023,7 +1023,7 @@ func (api *ConsensusAPI) delayPayloadImport(block *types.Block) engine.PayloadSt
 	// some strain from the forkchoice update.
 	err := api.eth.Downloader().BeaconExtend(api.eth.SyncMode(), block.Header())
 	if err == nil {
-		log.Debug("Payload accepted for sync extension", "number", block.NumberU64(), "hash", block.Hash())
+		log.Info("Payload accepted for sync extension", "number", block.NumberU64(), "hash", block.Hash())
 		return engine.PayloadStatusV1{Status: engine.SYNCING}
 	}
 	// Either no beacon sync was started yet, or it rejected the delivered
