@@ -417,11 +417,11 @@ func (s *skeleton) sync(head *types.Header) (*types.Header, error) {
 	cancel := make(chan struct{})
 	defer close(cancel)
 
-	log.Info("Starting reverse header sync cycle", "head", head.Number, "hash", head.Hash(), "cont", s.scratchHead)
+	log.Debug("Starting reverse header sync cycle", "head", head.Number, "hash", head.Hash(), "cont", s.scratchHead)
 
 	// Whether sync completed or not, disregard any future packets
 	defer func() {
-		log.Info("Terminating reverse header sync cycle", "head", head.Number, "hash", head.Hash(), "cont", s.scratchHead)
+		log.Debug("Terminating reverse header sync cycle", "head", head.Number, "hash", head.Hash(), "cont", s.scratchHead)
 		s.requests = make(map[uint64]*headerRequest)
 	}()
 
@@ -451,10 +451,10 @@ func (s *skeleton) sync(head *types.Header) (*types.Header, error) {
 			// checked for potential assignment or reassignment
 			peerid := event.peer.id
 			if event.join {
-				log.Info("Joining skeleton peer", "id", peerid)
+				log.Debug("Joining skeleton peer", "id", peerid)
 				s.idles[peerid] = event.peer
 			} else {
-				log.Info("Leaving skeleton peer", "id", peerid)
+				log.Debug("Leaving skeleton peer", "id", peerid)
 				s.revertRequests(peerid)
 				delete(s.idles, peerid)
 			}
@@ -502,11 +502,11 @@ func (s *skeleton) sync(head *types.Header) (*types.Header, error) {
 			// abort sync altogether.
 			linked, merged := s.processResponse(res)
 			if linked {
-				log.Info("Beacon sync linked to local chain")
+				log.Debug("Beacon sync linked to local chain")
 				return nil, errSyncLinked
 			}
 			if merged {
-				log.Info("Beacon sync merged subchains")
+				log.Debug("Beacon sync merged subchains")
 				return nil, errSyncMerged
 			}
 			// We still have work to do, loop and repeat
@@ -529,7 +529,7 @@ func (s *skeleton) initSync(head *types.Header) {
 		} else {
 			// Previous sync was available, print some continuation logs
 			for _, subchain := range s.progress.Subchains {
-				log.Info("Restarting skeleton subchain", "head", subchain.Head, "tail", subchain.Tail)
+				log.Debug("Restarting skeleton subchain", "head", subchain.Head, "tail", subchain.Tail)
 			}
 			// Create a new subchain for the head (unless the last can be extended),
 			// trimming anything it would overwrite
@@ -542,13 +542,13 @@ func (s *skeleton) initSync(head *types.Header) {
 				// If the last chain is above the new head, delete altogether
 				lastchain := s.progress.Subchains[0]
 				if lastchain.Tail >= headchain.Tail {
-					log.Info("Dropping skeleton subchain", "head", lastchain.Head, "tail", lastchain.Tail)
+					log.Debug("Dropping skeleton subchain", "head", lastchain.Head, "tail", lastchain.Tail)
 					s.progress.Subchains = s.progress.Subchains[1:]
 					continue
 				}
 				// Otherwise truncate the last chain if needed and abort trimming
 				if lastchain.Head >= headchain.Tail {
-					log.Info("Trimming skeleton subchain", "oldhead", lastchain.Head, "newhead", headchain.Tail-1, "tail", lastchain.Tail)
+					log.Debug("Trimming skeleton subchain", "oldhead", lastchain.Head, "newhead", headchain.Tail-1, "tail", lastchain.Tail)
 					lastchain.Head = headchain.Tail - 1
 				}
 				break
@@ -561,14 +561,14 @@ func (s *skeleton) initSync(head *types.Header) {
 				if lastchain.Head == headchain.Tail-1 {
 					lasthead := rawdb.ReadSkeletonHeader(s.db, lastchain.Head)
 					if lasthead.Hash() == head.ParentHash {
-						log.Info("Extended skeleton subchain with new head", "head", headchain.Tail, "tail", lastchain.Tail)
+						log.Debug("Extended skeleton subchain with new head", "head", headchain.Tail, "tail", lastchain.Tail)
 						lastchain.Head = headchain.Tail
 						extended = true
 					}
 				}
 			}
 			if !extended {
-				log.Info("Created new skeleton subchain", "head", number, "tail", number)
+				log.Debug("Created new skeleton subchain", "head", number, "tail", number)
 				s.progress.Subchains = append([]*subchain{headchain}, s.progress.Subchains...)
 			}
 			// Update the database with the new sync stats and insert the new
@@ -607,7 +607,7 @@ func (s *skeleton) initSync(head *types.Header) {
 	if err := batch.Write(); err != nil {
 		log.Crit("Failed to write initial skeleton sync status", "err", err)
 	}
-	log.Info("Created initial skeleton subchain", "head", number, "tail", number)
+	log.Debug("Created initial skeleton subchain", "head", number, "tail", number)
 }
 
 // saveSyncStatus marshals the remaining sync tasks into leveldb.
@@ -775,7 +775,7 @@ func (s *skeleton) executeTask(peer *peerConnection, req *headerRequest) {
 
 	select {
 	case <-req.cancel:
-		peer.log.Info("Header request cancelled")
+		peer.log.Debug("Header request cancelled")
 		s.scheduleRevertRequest(req)
 
 	case <-timeoutTimer.C:
@@ -807,25 +807,25 @@ func (s *skeleton) executeTask(peer *peerConnection, req *headerRequest) {
 		switch {
 		case len(headers) == 0:
 			// No headers were delivered, reject the response and reschedule
-			peer.log.Info("No headers delivered")
+			peer.log.Debug("No headers delivered")
 			res.Done <- errors.New("no headers delivered")
 			s.scheduleRevertRequest(req)
 
 		case headers[0].Number.Uint64() != req.head:
 			// Header batch anchored at non-requested number
-			peer.log.Info("Invalid header response head", "have", headers[0].Number, "want", req.head)
+			peer.log.Debug("Invalid header response head", "have", headers[0].Number, "want", req.head)
 			res.Done <- errors.New("invalid header batch anchor")
 			s.scheduleRevertRequest(req)
 
 		case req.head >= requestHeaders && len(headers) != requestHeaders:
 			// Invalid number of non-genesis headers delivered, reject the response and reschedule
-			peer.log.Info("Invalid non-genesis header count", "have", len(headers), "want", requestHeaders)
+			peer.log.Debug("Invalid non-genesis header count", "have", len(headers), "want", requestHeaders)
 			res.Done <- errors.New("not enough non-genesis headers delivered")
 			s.scheduleRevertRequest(req)
 
 		case req.head < requestHeaders && uint64(len(headers)) != req.head:
 			// Invalid number of genesis headers delivered, reject the response and reschedule
-			peer.log.Info("Invalid genesis header count", "have", len(headers), "want", headers[0].Number.Uint64())
+			peer.log.Debug("Invalid genesis header count", "have", len(headers), "want", headers[0].Number.Uint64())
 			res.Done <- errors.New("not enough genesis headers delivered")
 			s.scheduleRevertRequest(req)
 
@@ -834,7 +834,7 @@ func (s *skeleton) executeTask(peer *peerConnection, req *headerRequest) {
 			// is correct too, deliver for storage
 			for i := 0; i < len(headers)-1; i++ {
 				if headers[i].ParentHash != headers[i+1].Hash() {
-					peer.log.Info("Invalid hash progression", "index", i, "wantparenthash", headers[i].ParentHash, "haveparenthash", headers[i+1].Hash())
+					peer.log.Debug("Invalid hash progression", "index", i, "wantparenthash", headers[i].ParentHash, "haveparenthash", headers[i+1].Hash())
 					res.Done <- errors.New("invalid hash progression")
 					s.scheduleRevertRequest(req)
 					return
@@ -1015,7 +1015,7 @@ func (s *skeleton) processResponse(res *headerResponse) (linked bool, merged boo
 					// skeleton chain only if it's not covered by the current
 					// skeleton range.
 					if s.progress.Subchains[1].Head < s.progress.Subchains[0].Tail {
-						log.Info("Cleaning previous beacon sync state", "head", s.progress.Subchains[1].Head)
+						log.Debug("Cleaning previous beacon sync state", "head", s.progress.Subchains[1].Head)
 						rawdb.DeleteSkeletonHeader(batch, s.progress.Subchains[1].Head)
 					}
 					// Drop the leftover skeleton chain since it's stale.
@@ -1070,18 +1070,18 @@ func (s *skeleton) processResponse(res *headerResponse) (linked bool, merged boo
 			// its head independent of matching or mismatching content
 			if s.progress.Subchains[1].Tail >= s.progress.Subchains[0].Tail {
 				// Fully overwritten, get rid of the subchain as a whole
-				log.Info("Previous subchain fully overwritten", "head", head, "tail", tail, "next", next)
+				log.Debug("Previous subchain fully overwritten", "head", head, "tail", tail, "next", next)
 				s.progress.Subchains = append(s.progress.Subchains[:1], s.progress.Subchains[2:]...)
 				continue
 			} else {
 				// Partially overwritten, trim the head to the overwritten size
-				log.Info("Previous subchain partially overwritten", "head", head, "tail", tail, "next", next)
+				log.Debug("Previous subchain partially overwritten", "head", head, "tail", tail, "next", next)
 				s.progress.Subchains[1].Head = s.progress.Subchains[0].Tail - 1
 			}
 			// If the old subchain is an extension of the new one, merge the two
 			// and let the skeleton syncer restart (to clean internal state)
 			if rawdb.ReadSkeletonHeader(s.db, s.progress.Subchains[1].Head).Hash() == s.progress.Subchains[0].Next {
-				log.Info("Previous subchain merged", "head", head, "tail", tail, "next", next)
+				log.Debug("Previous subchain merged", "head", head, "tail", tail, "next", next)
 				s.progress.Subchains[0].Tail = s.progress.Subchains[1].Tail
 				s.progress.Subchains[0].Next = s.progress.Subchains[1].Next
 
@@ -1137,10 +1137,10 @@ func (s *skeleton) cleanStales(filled *types.Header) error {
 	// was interrupted before it got to do any meaningful work, no cleanup
 	header := rawdb.ReadSkeletonHeader(s.db, filled.Number.Uint64())
 	if header == nil {
-		log.Info("Filled header outside of skeleton range", "number", number, "head", s.progress.Subchains[0].Head, "tail", s.progress.Subchains[0].Tail)
+		log.Debug("Filled header outside of skeleton range", "number", number, "head", s.progress.Subchains[0].Head, "tail", s.progress.Subchains[0].Tail)
 		return nil
 	} else if header.Hash() != filled.Hash() {
-		log.Info("Filled header on different sidechain", "number", number, "filled", filled.Hash(), "skeleton", header.Hash())
+		log.Debug("Filled header on different sidechain", "number", number, "filled", filled.Hash(), "skeleton", header.Hash())
 		return nil
 	}
 	var (

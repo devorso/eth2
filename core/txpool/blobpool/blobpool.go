@@ -892,7 +892,7 @@ func (p *BlobPool) reorg(oldHead, newHead *types.Header) (map[common.Address][]*
 		}
 		// If the reorg ended up on a lower number, it's indicative of setHead
 		// being the cause
-		log.Info("Skipping blobpool reset caused by setHead",
+		log.Debug("Skipping blobpool reset caused by setHead",
 			"old", oldHead.Hash(), "oldnum", oldNum, "new", newHead.Hash(), "newnum", newNum)
 		return nil, nil
 	}
@@ -1079,7 +1079,7 @@ func (p *BlobPool) SetGasTip(tip *big.Int) {
 			}
 		}
 	}
-	log.Info("Blobpool tip threshold updated", "tip", tip)
+	log.Debug("Blobpool tip threshold updated", "tip", tip)
 	pooltipGauge.Update(tip.Int64())
 	p.updateStorageMetrics()
 }
@@ -1497,7 +1497,7 @@ func (p *BlobPool) drop() {
 		}
 	}
 	// Remove the transaction from the data store
-	log.Info("Evicting overflown blob transaction", "from", from, "evicted", drop.nonce, "id", drop.id)
+	log.Debug("Evicting overflown blob transaction", "from", from, "evicted", drop.nonce, "id", drop.id)
 	dropOverflownMeter.Mark(1)
 
 	if err := p.store.Delete(drop.id); err != nil {

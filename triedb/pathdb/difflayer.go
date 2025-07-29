@@ -52,7 +52,7 @@ func newDiffLayer(parent layer, root common.Hash, id uint64, block uint64, nodes
 		states: states,
 	}
 	dirtyNodeWriteMeter.Mark(int64(nodes.size))
-	log.Info("Created new diff layer", "id", id, "block", block, "nodesize", common.StorageSize(nodes.size), "statesize", common.StorageSize(states.size))
+	log.Debug("Created new diff layer", "id", id, "block", block, "nodesize", common.StorageSize(nodes.size), "statesize", common.StorageSize(states.size))
 	return dl
 }
 

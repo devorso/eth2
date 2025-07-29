@@ -270,7 +270,7 @@ func (db *Database) Dereference(root common.Hash) {
 	memcacheGCBytesMeter.Mark(int64(storage - db.dirtiesSize))
 	memcacheGCNodesMeter.Mark(int64(nodes - len(db.dirties)))
 
-	log.Info("Dereferenced trie from memory database", "nodes", nodes-len(db.dirties), "size", storage-db.dirtiesSize, "time", time.Since(start),
+	log.Debug("Dereferenced trie from memory database", "nodes", nodes-len(db.dirties), "size", storage-db.dirtiesSize, "time", time.Since(start),
 		"gcnodes", db.gcnodes, "gcsize", db.gcsize, "gctime", db.gctime, "livenodes", len(db.dirties), "livesize", db.dirtiesSize)
 }
 
@@ -388,7 +388,7 @@ func (db *Database) Cap(limit common.StorageSize) error {
 	memcacheFlushBytesMeter.Mark(int64(storage - db.dirtiesSize))
 	memcacheFlushNodesMeter.Mark(int64(nodes - len(db.dirties)))
 
-	log.Info("Persisted nodes from memory database", "nodes", nodes-len(db.dirties), "size", storage-db.dirtiesSize, "time", time.Since(start),
+	log.Debug("Persisted nodes from memory database", "nodes", nodes-len(db.dirties), "size", storage-db.dirtiesSize, "time", time.Since(start),
 		"flushnodes", db.flushnodes, "flushsize", db.flushsize, "flushtime", db.flushtime, "livenodes", len(db.dirties), "livesize", db.dirtiesSize)
 
 	return nil

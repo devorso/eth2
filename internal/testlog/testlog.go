@@ -133,7 +133,7 @@ func (l *logger) Debug(msg string, ctx ...interface{}) {
 	l.t.Helper()
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.l.Info(msg, ctx...)
+	l.l.Debug(msg, ctx...)
 	l.flush()
 }
 

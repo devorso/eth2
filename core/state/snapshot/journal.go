@@ -215,7 +215,7 @@ func (dl *diskLayer) Journal(buffer *bytes.Buffer) (common.Hash, error) {
 	// Ensure the generator stats is written even if none was ran this cycle
 	journalProgress(dl.diskdb, dl.genMarker, stats)
 
-	log.Info("Journalled disk layer", "root", dl.root)
+	log.Debug("Journalled disk layer", "root", dl.root)
 	return dl.root, nil
 }
 
@@ -265,7 +265,7 @@ func (dl *diffLayer) Journal(buffer *bytes.Buffer) (common.Hash, error) {
 	if err := rlp.Encode(buffer, storage); err != nil {
 		return common.Hash{}, err
 	}
-	log.Info("Journalled diff layer", "root", dl.root, "parent", dl.parent.Root())
+	log.Debug("Journalled diff layer", "root", dl.root, "parent", dl.parent.Root())
 	return base, nil
 }
 

@@ -178,7 +178,7 @@ func (f *chainFreezer) freeze(db ethdb.KeyValueStore) {
 		threshold, err := f.freezeThreshold(nfdb)
 		if err != nil {
 			backoff = true
-			log.Info("Current full block not old enough to freeze", "err", err)
+			log.Debug("Current full block not old enough to freeze", "err", err)
 			continue
 		}
 		frozen, _ := f.Ancients() // no error will occur, safe to ignore
@@ -186,7 +186,7 @@ func (f *chainFreezer) freeze(db ethdb.KeyValueStore) {
 		// Short circuit if the blocks below threshold are already frozen.
 		if frozen != 0 && frozen-1 >= threshold {
 			backoff = true
-			log.Info("Ancient blocks frozen already", "threshold", threshold, "frozen", frozen)
+			log.Debug("Ancient blocks frozen already", "threshold", threshold, "frozen", frozen)
 			continue
 		}
 		// Seems we have data ready to be frozen, process in usable batches
@@ -246,7 +246,7 @@ func (f *chainFreezer) freeze(db ethdb.KeyValueStore) {
 			for len(dangling) > 0 {
 				drop := make(map[common.Hash]struct{})
 				for _, hash := range dangling {
-					log.Info("Dangling parent from Freezer", "number", tip-1, "hash", hash)
+					log.Debug("Dangling parent from Freezer", "number", tip-1, "hash", hash)
 					drop[hash] = struct{}{}
 				}
 				children := ReadAllHashes(db, tip)
@@ -263,7 +263,7 @@ func (f *chainFreezer) freeze(db ethdb.KeyValueStore) {
 						continue
 					}
 					// Delete all block data associated with the child
-					log.Info("Deleting dangling block", "number", tip, "hash", children[i], "parent", child.ParentHash)
+					log.Debug("Deleting dangling block", "number", tip, "hash", children[i], "parent", child.ParentHash)
 					DeleteBlock(batch, children[i], tip)
 				}
 				dangling = children
@@ -281,7 +281,7 @@ func (f *chainFreezer) freeze(db ethdb.KeyValueStore) {
 		if n := len(ancients); n > 0 {
 			context = append(context, []interface{}{"hash", ancients[n-1]}...)
 		}
-		log.Info("Deep froze chain segment", context...)
+		log.Debug("Deep froze chain segment", context...)
 
 		// Avoid database thrashing with tiny writes
 		if frozen-first < freezerBatchLimit {

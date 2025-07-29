@@ -526,7 +526,7 @@ func (api *BlockChainAPI) GetUncleByBlockNumberAndIndex(ctx context.Context, blo
 	if block != nil {
 		uncles := block.Uncles()
 		if index >= hexutil.Uint(len(uncles)) {
-			log.Info("Requested uncle not found", "number", blockNr, "hash", block.Hash(), "index", index)
+			log.Debug("Requested uncle not found", "number", blockNr, "hash", block.Hash(), "index", index)
 			return nil, nil
 		}
 		block = types.NewBlockWithHeader(uncles[index])
@@ -541,7 +541,7 @@ func (api *BlockChainAPI) GetUncleByBlockHashAndIndex(ctx context.Context, block
 	if block != nil {
 		uncles := block.Uncles()
 		if index >= hexutil.Uint(len(uncles)) {
-			log.Info("Requested uncle not found", "number", block.Number(), "hash", blockHash, "index", index)
+			log.Debug("Requested uncle not found", "number", block.Number(), "hash", blockHash, "index", index)
 			return nil, nil
 		}
 		block = types.NewBlockWithHeader(uncles[index])
@@ -899,7 +899,7 @@ func applyMessageWithEVM(ctx context.Context, evm *vm.EVM, msg *core.Message, ti
 }
 
 func DoCall(ctx context.Context, b Backend, args TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, overrides *StateOverride, blockOverrides *BlockOverrides, timeout time.Duration, globalGasCap uint64) (*core.ExecutionResult, error) {
-	defer func(start time.Time) { log.Info("Executing EVM call finished", "runtime", time.Since(start)) }(time.Now())
+	defer func(start time.Time) { log.Debug("Executing EVM call finished", "runtime", time.Since(start)) }(time.Now())
 
 	state, header, err := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
 	if state == nil || err != nil {

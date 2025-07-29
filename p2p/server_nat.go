@@ -103,7 +103,7 @@ func (srv *Server) portMappingLoop() {
 		for _, m := range mappings {
 			if m.extPort != 0 {
 				log := newLogger(m.protocol, m.extPort, m.port)
-				log.Info("Deleting port mapping")
+				log.Debug("Deleting port mapping")
 				srv.NAT.DeleteMapping(m.protocol, m.extPort, m.port)
 			}
 		}
@@ -123,9 +123,9 @@ func (srv *Server) portMappingLoop() {
 			extip.Schedule(srv.clock.Now().Add(extipRetryInterval))
 			ip, err := srv.NAT.ExternalIP()
 			if err != nil {
-				log.Info("Couldn't get external IP", "err", err, "interface", srv.NAT)
+				log.Debug("Couldn't get external IP", "err", err, "interface", srv.NAT)
 			} else if !ip.Equal(lastExtIP) {
-				log.Info("External IP changed", "ip", ip, "interface", srv.NAT)
+				log.Debug("External IP changed", "ip", ip, "interface", srv.NAT)
 			} else {
 				continue
 			}
@@ -159,7 +159,7 @@ func (srv *Server) portMappingLoop() {
 				log.Trace("Attempting port mapping")
 				p, err := srv.NAT.AddMapping(m.protocol, external, m.port, m.name, portMapDuration)
 				if err != nil {
-					log.Info("Couldn't add port mapping", "err", err)
+					log.Debug("Couldn't add port mapping", "err", err)
 					m.extPort = 0
 					m.nextTime = srv.clock.Now().Add(portMapRetryInterval)
 					continue

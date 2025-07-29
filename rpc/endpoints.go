@@ -41,7 +41,7 @@ func StartIPCEndpoint(ipcEndpoint string, apis []API) (net.Listener, *Server, er
 			regMap[api.Namespace] = struct{}{}
 		}
 	}
-	log.Info("IPCs registered", "namespaces", strings.Join(registered, ","))
+	log.Debug("IPCs registered", "namespaces", strings.Join(registered, ","))
 	// All APIs registered, start the IPC listener.
 	listener, err := ipcListen(ipcEndpoint)
 	if err != nil {

@@ -395,9 +395,9 @@ func (d *Downloader) syncToHead() (err error) {
 	}()
 	mode := d.getMode()
 
-	log.Info("Backfilling with the network", "mode", mode)
+	log.Debug("Backfilling with the network", "mode", mode)
 	defer func(start time.Time) {
-		log.Info("Synchronisation terminated", "elapsed", common.PrettyDuration(time.Since(start)))
+		log.Debug("Synchronisation terminated", "elapsed", common.PrettyDuration(time.Since(start)))
 	}(time.Now())
 
 	// Look up the sync boundaries: the common ancestor and the target block
@@ -503,7 +503,7 @@ func (d *Downloader) syncToHead() (err error) {
 			d.ancientLimit = 0
 			log.Info("Disabling direct-ancient mode", "origin", origin, "ancient", frozen-1)
 		} else if d.ancientLimit > 0 {
-			log.Info("Enabling direct-ancient mode", "ancient", d.ancientLimit)
+			log.Debug("Enabling direct-ancient mode", "ancient", d.ancientLimit)
 		}
 		// Rewind the ancient store and blockchain if reorg happens.
 		if origin+1 < frozen {
@@ -612,10 +612,10 @@ func (d *Downloader) Terminate() {
 // available peers, reserving a chunk of blocks for each, waiting for delivery
 // and also periodically checking for timeouts.
 func (d *Downloader) fetchBodies(from uint64) error {
-	log.Info("Downloading block bodies", "origin", from)
+	log.Debug("Downloading block bodies", "origin", from)
 	err := d.concurrentFetch((*bodyQueue)(d))
 
-	log.Info("Block body download terminated", "err", err)
+	log.Debug("Block body download terminated", "err", err)
 	return err
 }
 
@@ -623,10 +623,10 @@ func (d *Downloader) fetchBodies(from uint64) error {
 // available peers, reserving a chunk of receipts for each, waiting for delivery
 // and also periodically checking for timeouts.
 func (d *Downloader) fetchReceipts(from uint64) error {
-	log.Info("Downloading receipts", "origin", from)
+	log.Debug("Downloading receipts", "origin", from)
 	err := d.concurrentFetch((*receiptQueue)(d))
 
-	log.Info("Receipt download terminated", "err", err)
+	log.Debug("Receipt download terminated", "err", err)
 	return err
 }
 
@@ -752,7 +752,7 @@ func (d *Downloader) importBlockResults(results []*fetchResult) error {
 	}
 	// Retrieve a batch of results to import
 	first, last := results[0].Header, results[len(results)-1].Header
-	log.Info("Inserting downloaded chain", "items", len(results),
+	log.Debug("Inserting downloaded chain", "items", len(results),
 		"firstnum", first.Number, "firsthash", first.Hash(),
 		"lastnum", last.Number, "lasthash", last.Hash(),
 	)
@@ -765,7 +765,7 @@ func (d *Downloader) importBlockResults(results []*fetchResult) error {
 	// consensus-layer.
 	if index, err := d.blockchain.InsertChain(blocks); err != nil {
 		if index < len(results) {
-			log.Info("Downloaded item processing failed", "number", results[index].Header.Number, "hash", results[index].Header.Hash(), "err", err)
+			log.Debug("Downloaded item processing failed", "number", results[index].Header.Number, "hash", results[index].Header.Hash(), "err", err)
 
 			// In post-merge, notify the engine API of encountered bad chains
 			if d.badBlock != nil {
@@ -781,7 +781,7 @@ func (d *Downloader) importBlockResults(results []*fetchResult) error {
 			// when it needs to preprocess blocks to import a sidechain.
 			// The importer will put together a new list of blocks to import, which is a superset
 			// of the blocks delivered from the downloader, and the indexing will be off.
-			log.Info("Downloaded item processing failed on sidechain import", "index", index, "err", err)
+			log.Debug("Downloaded item processing failed on sidechain import", "index", index, "err", err)
 		}
 		return fmt.Errorf("%w: %v", errInvalidChain, err)
 	}
@@ -973,7 +973,7 @@ func (d *Downloader) commitSnapSyncData(results []*fetchResult, stateSync *state
 	}
 	// Retrieve the batch of results to import
 	first, last := results[0].Header, results[len(results)-1].Header
-	log.Info("Inserting snap-sync blocks", "items", len(results),
+	log.Debug("Inserting snap-sync blocks", "items", len(results),
 		"firstnum", first.Number, "firsthash", first.Hash(),
 		"lastnumn", last.Number, "lasthash", last.Hash(),
 	)
@@ -984,7 +984,7 @@ func (d *Downloader) commitSnapSyncData(results []*fetchResult, stateSync *state
 		receipts[i] = result.Receipts
 	}
 	if index, err := d.blockchain.InsertReceiptChain(blocks, receipts, d.ancientLimit); err != nil {
-		log.Info("Downloaded item processing failed", "number", results[index].Header.Number, "hash", results[index].Header.Hash(), "err", err)
+		log.Debug("Downloaded item processing failed", "number", results[index].Header.Number, "hash", results[index].Header.Hash(), "err", err)
 		return fmt.Errorf("%w: %v", errInvalidChain, err)
 	}
 	return nil
@@ -992,7 +992,7 @@ func (d *Downloader) commitSnapSyncData(results []*fetchResult, stateSync *state
 
 func (d *Downloader) commitPivotBlock(result *fetchResult) error {
 	block := types.NewBlockWithHeader(result.Header).WithBody(result.body())
-	log.Info("Committing snap sync pivot as new head", "number", block.Number(), "hash", block.Hash())
+	log.Debug("Committing snap sync pivot as new head", "number", block.Number(), "hash", block.Hash())
 
 	// Commit the pivot block as the new head, will require full sync from here on
 	if _, err := d.blockchain.InsertReceiptChain([]*types.Block{block}, []types.Receipts{result.Receipts}, d.ancientLimit); err != nil {

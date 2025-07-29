@@ -362,7 +362,7 @@ func (c *ChainIndexer) updateLoop() {
 					}
 				} else {
 					// If processing failed, don't retry until further notification
-					c.log.Info("Chain index processing failed", "section", section, "err", err)
+					c.log.Debug("Chain index processing failed", "section", section, "err", err)
 					c.verifyLastHead()
 					c.knownSections = c.storedSections
 				}

@@ -147,7 +147,7 @@ func prune(snaptree *snapshot.Tree, root common.Hash, maindb ethdb.Database, sta
 				checkKey = codeKey
 			}
 			if _, exist := middleStateRoots[common.BytesToHash(checkKey)]; exist {
-				log.Info("Forcibly delete the middle state roots", "hash", common.BytesToHash(checkKey))
+				log.Debug("Forcibly delete the middle state roots", "hash", common.BytesToHash(checkKey))
 			} else {
 				if stateBloom.Contain(checkKey) {
 					skipped += 1

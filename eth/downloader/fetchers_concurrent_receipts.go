@@ -66,7 +66,7 @@ func (q *receiptQueue) unreserve(peer string) int {
 	if fails > 2 {
 		log.Trace("Receipt delivery timed out", "peer", peer)
 	} else {
-		log.Info("Receipt delivery stalling", "peer", peer)
+		log.Debug("Receipt delivery stalling", "peer", peer)
 	}
 	return fails
 }
@@ -98,7 +98,7 @@ func (q *receiptQueue) deliver(peer *peerConnection, packet *eth.Response) (int,
 	case err == nil:
 		peer.log.Trace("Delivered new batch of receipts", "count", len(receipts), "accepted", accepted)
 	default:
-		peer.log.Info("Failed to deliver retrieved receipts", "err", err)
+		peer.log.Debug("Failed to deliver retrieved receipts", "err", err)
 	}
 	return accepted, err
 }

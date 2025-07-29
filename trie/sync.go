@@ -585,7 +585,7 @@ func (s *Sync) children(req *nodeRequest, object node) ([]*nodeRequest, error) {
 				}
 				if exists {
 					s.membatch.delNode(owner, append(inner, key[:i]...))
-					log.Info("Detected dangling node", "owner", owner, "path", append(inner, key[:i]...))
+					log.Debug("Detected dangling node", "owner", owner, "path", append(inner, key[:i]...))
 				}
 			}
 			lookupGauge.Inc(int64(len(key) - 1))

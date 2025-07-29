@@ -188,7 +188,7 @@ func (s *Server) Stop() {
 	defer s.mutex.Unlock()
 
 	if s.run.CompareAndSwap(true, false) {
-		log.Info("RPC server shutting down")
+		log.Debug("RPC server shutting down")
 		for codec := range s.codecs {
 			codec.close()
 		}

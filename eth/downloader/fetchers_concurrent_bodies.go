@@ -66,7 +66,7 @@ func (q *bodyQueue) unreserve(peer string) int {
 	if fails > 2 {
 		log.Trace("Body delivery timed out", "peer", peer)
 	} else {
-		log.Info("Body delivery stalling", "peer", peer)
+		log.Debug("Body delivery stalling", "peer", peer)
 	}
 	return fails
 }
@@ -98,7 +98,7 @@ func (q *bodyQueue) deliver(peer *peerConnection, packet *eth.Response) (int, er
 	case err == nil:
 		peer.log.Trace("Delivered new batch of bodies", "count", len(txs), "accepted", accepted)
 	default:
-		peer.log.Info("Failed to deliver retrieved bodies", "err", err)
+		peer.log.Debug("Failed to deliver retrieved bodies", "err", err)
 	}
 	return accepted, err
 }

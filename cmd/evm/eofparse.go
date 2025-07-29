@@ -55,7 +55,7 @@ func eofParseAction(ctx *cli.Context) error {
 			if info.IsDir() {
 				return nil
 			}
-			log.Info("Executing test", "name", info.Name())
+			log.Debug("Executing test", "name", info.Name())
 			passed, tot, err := executeTest(path)
 			passedTests += passed
 			executedTests += tot

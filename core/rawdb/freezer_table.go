@@ -367,7 +367,7 @@ func (t *freezerTable) repair() error {
 	if verbose {
 		t.logger.Info("Chain freezer table opened", "items", t.items.Load(), "deleted", t.itemOffset.Load(), "hidden", t.itemHidden.Load(), "tailId", t.tailId, "headId", t.headId, "size", t.headBytes)
 	} else {
-		t.logger.Info("Chain freezer table opened", "items", t.items.Load(), "size", common.StorageSize(t.headBytes))
+		t.logger.Debug("Chain freezer table opened", "items", t.items.Load(), "size", common.StorageSize(t.headBytes))
 	}
 	return nil
 }
@@ -470,7 +470,7 @@ func (t *freezerTable) repairIndex() error {
 	if err != nil {
 		return err
 	}
-	log.Info("Verified index file", "items", size/indexEntrySize, "elapsed", common.PrettyDuration(time.Since(start)))
+	log.Debug("Verified index file", "items", size/indexEntrySize, "elapsed", common.PrettyDuration(time.Since(start)))
 	return nil
 }
 

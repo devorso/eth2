@@ -241,7 +241,7 @@ func (ac *accountCache) scanAccounts() error {
 	// Scan the entire folder metadata for file changes
 	creates, deletes, updates, err := ac.fileC.scan(ac.keydir)
 	if err != nil {
-		log.Info("Failed to reload keystore contents", "err", err)
+		log.Debug("Failed to reload keystore contents", "err", err)
 		return err
 	}
 	if creates.Cardinality() == 0 && deletes.Cardinality() == 0 && updates.Cardinality() == 0 {
@@ -268,9 +268,9 @@ func (ac *accountCache) scanAccounts() error {
 		addr := common.HexToAddress(key.Address)
 		switch {
 		case err != nil:
-			log.Info("Failed to decode keystore key", "path", path, "err", err)
+			log.Debug("Failed to decode keystore key", "path", path, "err", err)
 		case addr == common.Address{}:
-			log.Info("Failed to decode keystore key", "path", path, "err", "missing or zero address")
+			log.Debug("Failed to decode keystore key", "path", path, "err", "missing or zero address")
 		default:
 			return &accounts.Account{
 				Address: addr,

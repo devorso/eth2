@@ -116,7 +116,7 @@ func logTest(ctx *cli.Context) error {
 		log.Info("repeated-key 2", "xx", "short", "xx", "longer")
 	}
 	{ // loglevels
-		log.Info("log at level debug")
+		log.Debug("log at level debug")
 		log.Trace("log at level trace")
 		log.Info("log at level info")
 		log.Warn("log at level warn")

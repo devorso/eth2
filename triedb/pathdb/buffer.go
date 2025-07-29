@@ -136,6 +136,6 @@ func (b *buffer) flush(db ethdb.KeyValueStore, freezer ethdb.AncientWriter, node
 	commitNodesMeter.Mark(int64(nodes))
 	commitTimeTimer.UpdateSince(start)
 	b.reset()
-	log.Info("Persisted buffer content", "nodes", nodes, "bytes", common.StorageSize(size), "elapsed", common.PrettyDuration(time.Since(start)))
+	log.Debug("Persisted buffer content", "nodes", nodes, "bytes", common.StorageSize(size), "elapsed", common.PrettyDuration(time.Since(start)))
 	return nil
 }

@@ -1602,7 +1602,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	cache := ctx.Int(CacheFlag.Name)
 	gogc := math.Max(20, math.Min(100, 100/(float64(cache)/1024)))
 
-	log.Info("Sanitizing Go's GC trigger", "percent", int(gogc))
+	log.Debug("Sanitizing Go's GC trigger", "percent", int(gogc))
 	godebug.SetGCPercent(int(gogc))
 
 	if ctx.IsSet(SyncTargetFlag.Name) {

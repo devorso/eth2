@@ -690,7 +690,7 @@ func (srv *Server) setupUDPListening() (*net.UDPConn, error) {
 	}
 	laddr := conn.LocalAddr().(*net.UDPAddr)
 	srv.localnode.SetFallbackUDP(laddr.Port)
-	srv.log.Info("UDP listener up", "addr", laddr)
+	srv.log.Debug("UDP listener up", "addr", laddr)
 	if !laddr.IP.IsLoopback() && !laddr.IP.IsPrivate() {
 		srv.portMappingRegister <- &portMapping{
 			protocol: "UDP",
@@ -778,7 +778,7 @@ running:
 				// The handshakes are done and it passed all checks.
 				p := srv.launchPeer(c)
 				peers[c.node.ID()] = p
-				srv.log.Info("Adding p2p peer", "peercount", len(peers), "id", p.ID(), "conn", c.flags, "addr", p.RemoteAddr(), "name", p.Name())
+				srv.log.Debug("Adding p2p peer", "peercount", len(peers), "id", p.ID(), "conn", c.flags, "addr", p.RemoteAddr(), "name", p.Name())
 				srv.dialsched.peerAdded(c)
 				if p.Inbound() {
 					inboundCount++
@@ -796,7 +796,7 @@ running:
 			// A peer disconnected.
 			d := common.PrettyDuration(mclock.Now() - pd.created)
 			delete(peers, pd.ID())
-			srv.log.Info("Removing p2p peer", "peercount", len(peers), "id", pd.ID(), "duration", d, "req", pd.requested, "err", pd.err)
+			srv.log.Debug("Removing p2p peer", "peercount", len(peers), "id", pd.ID(), "duration", d, "req", pd.requested, "err", pd.err)
 			srv.dialsched.peerRemoved(pd.rw)
 			if pd.Inbound() {
 				inboundCount--
@@ -859,7 +859,7 @@ func (srv *Server) addPeerChecks(peers map[enode.ID]*Peer, inboundCount int, c *
 // listenLoop runs in its own goroutine and accepts
 // inbound connections.
 func (srv *Server) listenLoop() {
-	srv.log.Info("TCP listener up", "addr", srv.listener.Addr())
+	srv.log.Debug("TCP listener up", "addr", srv.listener.Addr())
 
 	// The slots channel limits accepts of new connections.
 	tokens := defaultMaxPendingPeers
@@ -893,13 +893,13 @@ func (srv *Server) listenLoop() {
 			fd, err = srv.listener.Accept()
 			if netutil.IsTemporaryError(err) {
 				if time.Since(lastLog) > 1*time.Second {
-					srv.log.Info("Temporary read error", "err", err)
+					srv.log.Debug("Temporary read error", "err", err)
 					lastLog = time.Now()
 				}
 				time.Sleep(time.Millisecond * 200)
 				continue
 			} else if err != nil {
-				srv.log.Info("Read error", "err", err)
+				srv.log.Debug("Read error", "err", err)
 				slots <- struct{}{}
 				return
 			}
@@ -908,7 +908,7 @@ func (srv *Server) listenLoop() {
 
 		remoteIP := netutil.AddrAddr(fd.RemoteAddr())
 		if err := srv.checkInboundConn(remoteIP); err != nil {
-			srv.log.Info("Rejected inbound connection", "addr", fd.RemoteAddr(), "err", err)
+			srv.log.Debug("Rejected inbound connection", "addr", fd.RemoteAddr(), "err", err)
 			fd.Close()
 			slots <- struct{}{}
 			continue

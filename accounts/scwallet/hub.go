@@ -233,12 +233,12 @@ func (hub *Hub) refreshWallets() {
 		// New card detected, try to connect to it
 		card, err := hub.context.Connect(reader, pcsc.ShareShared, pcsc.ProtocolAny)
 		if err != nil {
-			log.Info("Failed to open smart card", "reader", reader, "err", err)
+			log.Debug("Failed to open smart card", "reader", reader, "err", err)
 			continue
 		}
 		wallet := NewWallet(hub, card)
 		if err = wallet.connect(); err != nil {
-			log.Info("Failed to connect to smart card", "reader", reader, "err", err)
+			log.Debug("Failed to connect to smart card", "reader", reader, "err", err)
 			card.Disconnect(pcsc.LeaveCard)
 			continue
 		}

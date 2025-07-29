@@ -256,7 +256,7 @@ func (h *handler) runEthPeer(peer *eth.Peer, handler eth.Handler) error {
 	)
 	forkID := forkid.NewID(h.chain.Config(), genesis, number, head.Time)
 	if err := peer.Handshake(h.networkID, td, hash, genesis.Hash(), forkID, h.forkFilter); err != nil {
-		peer.Log().Info("Ethereum handshake failed", "err", err)
+		peer.Log().Debug("Ethereum handshake failed", "err", err)
 		return err
 	}
 	reject := false // reserved peer slots
@@ -276,7 +276,7 @@ func (h *handler) runEthPeer(peer *eth.Peer, handler eth.Handler) error {
 			return p2p.DiscTooManyPeers
 		}
 	}
-	peer.Log().Info("Ethereum peer connected", "name", peer.Name())
+	peer.Log().Debug("Ethereum peer connected", "name", peer.Name())
 
 	// Register the peer locally
 	if err := h.peers.registerPeer(peer, snap); err != nil {
@@ -342,7 +342,7 @@ func (h *handler) runEthPeer(peer *eth.Peer, handler eth.Handler) error {
 					res.Done <- errors.New("required block mismatch")
 					return
 				}
-				peer.Log().Info("Peer required block verified", "number", number, "hash", hash)
+				peer.Log().Debug("Peer required block verified", "number", number, "hash", hash)
 				res.Done <- nil
 			case <-timeout.C:
 				peer.Log().Warn("Required block challenge timed out, dropping", "addr", peer.RemoteAddr(), "type", peer.Name())
@@ -372,7 +372,7 @@ func (h *handler) runSnapExtension(peer *snap.Peer, handler snap.Handler) error 
 				snap.EgressRegistrationErrorMeter.Mark(1)
 			}
 		}
-		peer.Log().Info("Snapshot extension registration failed", "err", err)
+		peer.Log().Debug("Snapshot extension registration failed", "err", err)
 		return err
 	}
 	return handler(peer)
@@ -403,7 +403,7 @@ func (h *handler) unregisterPeer(id string) {
 		return
 	}
 	// Remove the `eth` peer if it exists
-	logger.Info("Removing Ethereum peer", "snap", peer.snapExt != nil)
+	logger.Debug("Removing Ethereum peer", "snap", peer.snapExt != nil)
 
 	// Remove the `snap` extension if it exists
 	if peer.snapExt != nil {
@@ -527,7 +527,7 @@ func (h *handler) BroadcastTransactions(txs types.Transactions) {
 		annCount += len(hashes)
 		peer.AsyncSendPooledTransactionHashes(hashes)
 	}
-	log.Info("Distributed transactions", "plaintxs", len(txs)-blobTxs-largeTxs, "blobtxs", blobTxs, "largetxs", largeTxs,
+	log.Debug("Distributed transactions", "plaintxs", len(txs)-blobTxs-largeTxs, "blobtxs", blobTxs, "largetxs", largeTxs,
 		"bcastpeers", len(txset), "bcastcount", directCount, "annpeers", len(annos), "anncount", annCount)
 }
 

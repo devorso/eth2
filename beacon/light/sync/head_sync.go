@@ -117,7 +117,7 @@ func (s *HeadSync) newOptimisticUpdate(server request.Server, optimisticUpdate t
 		return
 	}
 	if _, err := s.headTracker.ValidateOptimistic(optimisticUpdate); err != nil {
-		log.Info("Error validating optimistic update", "error", err)
+		log.Debug("Error validating optimistic update", "error", err)
 	}
 }
 
@@ -129,7 +129,7 @@ func (s *HeadSync) newFinalityUpdate(server request.Server, finalityUpdate types
 		return
 	}
 	if _, err := s.headTracker.ValidateFinality(finalityUpdate); err != nil {
-		log.Info("Error validating finality update", "error", err)
+		log.Debug("Error validating finality update", "error", err)
 	}
 }
 
@@ -142,7 +142,7 @@ func (s *HeadSync) processUnvalidatedUpdates() {
 	for server, optimisticUpdate := range s.unvalidatedOptimistic {
 		if types.SyncPeriod(optimisticUpdate.SignatureSlot) <= s.nextSyncPeriod {
 			if _, err := s.headTracker.ValidateOptimistic(optimisticUpdate); err != nil {
-				log.Info("Error validating deferred optimistic update", "error", err)
+				log.Debug("Error validating deferred optimistic update", "error", err)
 			}
 			delete(s.unvalidatedOptimistic, server)
 		}
@@ -150,7 +150,7 @@ func (s *HeadSync) processUnvalidatedUpdates() {
 	for server, finalityUpdate := range s.unvalidatedFinality {
 		if types.SyncPeriod(finalityUpdate.SignatureSlot) <= s.nextSyncPeriod {
 			if _, err := s.headTracker.ValidateFinality(finalityUpdate); err != nil {
-				log.Info("Error validating deferred finality update", "error", err)
+				log.Debug("Error validating deferred finality update", "error", err)
 			}
 			delete(s.unvalidatedFinality, server)
 		}

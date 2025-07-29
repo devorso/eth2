@@ -484,11 +484,11 @@ func (tab *Table) addIP(b *bucket, ip netip.Addr) bool {
 		return true
 	}
 	if !tab.ips.AddAddr(ip) {
-		tab.log.Info("IP exceeds table limit", "ip", ip)
+		tab.log.Debug("IP exceeds table limit", "ip", ip)
 		return false
 	}
 	if !b.ips.AddAddr(ip) {
-		tab.log.Info("IP exceeds bucket limit", "ip", ip)
+		tab.log.Debug("IP exceeds bucket limit", "ip", ip)
 		tab.ips.RemoveAddr(ip)
 		return false
 	}
@@ -602,7 +602,7 @@ func (tab *Table) deleteInBucket(b *bucket, id enode.ID) *tableNode {
 
 	// Add replacement.
 	if len(b.replacements) == 0 {
-		tab.log.Info("Removed dead node", "b", b.index, "id", n.ID(), "ip", n.IPAddr())
+		tab.log.Debug("Removed dead node", "b", b.index, "id", n.ID(), "ip", n.IPAddr())
 		return nil
 	}
 	rindex := tab.rand.Intn(len(b.replacements))
@@ -610,7 +610,7 @@ func (tab *Table) deleteInBucket(b *bucket, id enode.ID) *tableNode {
 	b.replacements = slices.Delete(b.replacements, rindex, rindex+1)
 	b.entries = append(b.entries, rep)
 	tab.nodeAdded(b, rep)
-	tab.log.Info("Replaced dead node", "b", b.index, "id", n.ID(), "ip", n.IPAddr(), "r", rep.ID(), "rip", rep.IPAddr())
+	tab.log.Debug("Replaced dead node", "b", b.index, "id", n.ID(), "ip", n.IPAddr(), "r", rep.ID(), "rip", rep.IPAddr())
 	return rep
 }
 
