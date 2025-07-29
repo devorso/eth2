@@ -243,7 +243,7 @@ func (c *route53Client) computeChanges(name string, records map[string]string, e
 
 		if !exists {
 			// Entry is unknown, push a new one
-			log.Debug(fmt.Sprintf("Creating %s = %s", path, newValue))
+			log.Info(fmt.Sprintf("Creating %s = %s", path, newValue))
 			changes = append(changes, newTXTChange("CREATE", path, ttl, newValue))
 			inserts++
 		} else if prevValue != newValue || prevRecords.ttl != ttl {
@@ -252,7 +252,7 @@ func (c *route53Client) computeChanges(name string, records map[string]string, e
 			changes = append(changes, newTXTChange("UPSERT", path, ttl, newValue))
 			upserts++
 		} else {
-			log.Debug(fmt.Sprintf("Skipping %s = %s", path, newValue))
+			log.Info(fmt.Sprintf("Skipping %s = %s", path, newValue))
 			skips++
 		}
 	}
@@ -279,7 +279,7 @@ func makeDeletionChanges(records map[string]recordSet, keep map[string]string) [
 		if _, ok := keep[path]; ok {
 			continue
 		}
-		log.Debug(fmt.Sprintf("Deleting %s = %s", path, strings.Join(set.values, "")))
+		log.Info(fmt.Sprintf("Deleting %s = %s", path, strings.Join(set.values, "")))
 		changes = append(changes, newTXTChange("DELETE", path, set.ttl, set.values...))
 	}
 	return changes
@@ -353,7 +353,7 @@ func (c *route53Client) collectRecords(name string) (map[string]recordSet, error
 	existing := make(map[string]recordSet)
 	log.Info("Loading existing TXT records", "name", name, "zone", c.zoneID)
 	for page := 0; ; page++ {
-		log.Debug("Loading existing TXT records", "name", name, "zone", c.zoneID, "page", page)
+		log.Info("Loading existing TXT records", "name", name, "zone", c.zoneID, "page", page)
 		resp, err := c.api.ListResourceRecordSets(context.TODO(), &req)
 		if err != nil {
 			return existing, err

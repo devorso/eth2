@@ -170,21 +170,21 @@ func doPortMapping(natm nat.Interface, ln *enode.LocalNode, addr *net.UDPAddr) *
 		var err error
 		extaddr.IP, err = natm.ExternalIP()
 		if err != nil {
-			log.Info("Couldn't get external IP", "err", err)
+			log.Debug("Couldn't get external IP", "err", err)
 			return
 		}
 		// Create the mapping.
 		p, err := natm.AddMapping(protocol, extaddr.Port, intport, name, mapTimeout)
 		if err != nil {
-			log.Info("Couldn't add port mapping", "err", err)
+			log.Debug("Couldn't add port mapping", "err", err)
 			return
 		}
 		if p != uint16(extaddr.Port) {
 			extaddr.Port = int(p)
 			log = newLogger(extaddr.Port, intport)
-			log.Info("NAT mapped alternative port")
+			log.Debug("NAT mapped alternative port")
 		} else {
-			log.Info("NAT mapped port")
+			log.Debug("NAT mapped port")
 		}
 		// Update IP/port information of the local node.
 		ln.SetStaticIP(extaddr.IP)
@@ -192,7 +192,7 @@ func doPortMapping(natm nat.Interface, ln *enode.LocalNode, addr *net.UDPAddr) *
 	}
 
 	// Perform mapping once, synchronously.
-	log.Info("Attempting port mapping")
+	log.Debug("Attempting port mapping")
 	addMapping()
 
 	// Refresh the mapping periodically.

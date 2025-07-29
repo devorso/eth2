@@ -104,11 +104,11 @@ func Map(m Interface, c <-chan struct{}, protocol string, extport, intport int, 
 	refresh := time.NewTimer(DefaultMapTimeout)
 	defer func() {
 		refresh.Stop()
-		log.Debug("Deleting port mapping")
+		log.Info("Deleting port mapping")
 		m.DeleteMapping(protocol, extport, intport)
 	}()
 	if _, err := m.AddMapping(protocol, extport, intport, name, DefaultMapTimeout); err != nil {
-		log.Debug("Couldn't add port mapping", "err", err)
+		log.Info("Couldn't add port mapping", "err", err)
 	} else {
 		log.Info("Mapped network port")
 	}
@@ -121,7 +121,7 @@ func Map(m Interface, c <-chan struct{}, protocol string, extport, intport int, 
 		case <-refresh.C:
 			log.Trace("Refreshing port mapping")
 			if _, err := m.AddMapping(protocol, extport, intport, name, DefaultMapTimeout); err != nil {
-				log.Debug("Couldn't add port mapping", "err", err)
+				log.Info("Couldn't add port mapping", "err", err)
 			}
 			refresh.Reset(DefaultMapTimeout)
 		}

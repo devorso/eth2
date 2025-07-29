@@ -134,7 +134,7 @@ loop:
 		case it := <-doneCh:
 			if it == c.inputIter {
 				// Enable timeout when we're done revalidating the input nodes.
-				log.Info("Revalidation of input set is done", "len", len(c.input))
+				log.Debug("Revalidation of input set is done", "len", len(c.input))
 				if timeout > 0 {
 					timeoutCh = timeoutTimer.C
 				}
@@ -145,7 +145,7 @@ loop:
 		case <-timeoutCh:
 			break loop
 		case <-statusTicker.C:
-			log.Info("Crawling in progress",
+			log.Debug("Crawling in progress",
 				"added", added.Load(),
 				"updated", updated.Load(),
 				"removed", removed.Load(),
@@ -194,7 +194,7 @@ func (c *crawler) updateNode(n *enode.Node) int {
 	if nn, err := c.disc.RequestENR(n); err != nil {
 		if node.Score == 0 {
 			// Node doesn't implement EIP-868.
-			log.Info("Skipping node", "id", n.ID())
+			log.Debug("Skipping node", "id", n.ID())
 			return nodeSkipIncompat
 		}
 		node.Score /= 2
@@ -212,11 +212,11 @@ func (c *crawler) updateNode(n *enode.Node) int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if node.Score <= 0 {
-		log.Info("Removing node", "id", n.ID())
+		log.Debug("Removing node", "id", n.ID())
 		delete(c.output, n.ID())
 		return nodeRemoved
 	}
-	log.Info("Updating node", "id", n.ID(), "seq", n.Seq(), "score", node.Score)
+	log.Debug("Updating node", "id", n.ID(), "seq", n.Seq(), "score", node.Score)
 	c.output[n.ID()] = node
 	return status
 }

@@ -179,8 +179,8 @@ func (w *wallet) Open(passphrase string) error {
 // heartbeat is a health check loop for the USB wallets to periodically verify
 // whether they are still present or if they malfunctioned.
 func (w *wallet) heartbeat() {
-	w.log.Debug("USB wallet health-check started")
-	defer w.log.Debug("USB wallet health-check stopped")
+	w.log.Info("USB wallet health-check started")
+	defer w.log.Info("USB wallet health-check stopped")
 
 	// Execute heartbeat checks until termination or error
 	var (
@@ -218,7 +218,7 @@ func (w *wallet) heartbeat() {
 	}
 	// In case of error, wait for termination
 	if err != nil {
-		w.log.Debug("USB wallet health-check failed", "err", err)
+		w.log.Info("USB wallet health-check failed", "err", err)
 		errc = <-w.healthQuit
 	}
 	errc <- err
@@ -304,8 +304,8 @@ func (w *wallet) Accounts() []accounts.Account {
 // selfDerive is an account derivation loop that upon request attempts to find
 // new non-zero accounts.
 func (w *wallet) selfDerive() {
-	w.log.Debug("USB wallet self-derivation started")
-	defer w.log.Debug("USB wallet self-derivation stopped")
+	w.log.Info("USB wallet self-derivation started")
+	defer w.log.Info("USB wallet self-derivation stopped")
 
 	// Execute self-derivations until termination or error
 	var (
@@ -434,7 +434,7 @@ func (w *wallet) selfDerive() {
 	}
 	// In case of error, wait for termination
 	if err != nil {
-		w.log.Debug("USB wallet self-derivation failed", "err", err)
+		w.log.Info("USB wallet self-derivation failed", "err", err)
 		errc = <-w.deriveQuit
 	}
 	errc <- err

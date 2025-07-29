@@ -446,8 +446,8 @@ func (w *Wallet) Close() error {
 // selfDerive is an account derivation loop that upon request attempts to find
 // new non-zero accounts.
 func (w *Wallet) selfDerive() {
-	w.log.Debug("Smart card wallet self-derivation started")
-	defer w.log.Debug("Smart card wallet self-derivation stopped")
+	w.log.Info("Smart card wallet self-derivation started")
+	defer w.log.Info("Smart card wallet self-derivation stopped")
 
 	// Execute self-derivations until termination or error
 	var (
@@ -557,7 +557,7 @@ func (w *Wallet) selfDerive() {
 	}
 	// In case of error, wait for termination
 	if err != nil {
-		w.log.Debug("Smartcard wallet self-derivation failed", "err", err)
+		w.log.Info("Smartcard wallet self-derivation failed", "err", err)
 		errc = <-w.deriveQuit
 	}
 	errc <- err
@@ -1064,7 +1064,7 @@ func (s *Session) sign(path accounts.DerivationPath, hash []byte) ([]byte, error
 	if err != nil {
 		return nil, err
 	}
-	log.Debug("Signed using smartcard", "deriveTime", deriveTime.Sub(startTime), "signingTime", time.Since(deriveTime))
+	log.Info("Signed using smartcard", "deriveTime", deriveTime.Sub(startTime), "signingTime", time.Since(deriveTime))
 
 	return sig, nil
 }

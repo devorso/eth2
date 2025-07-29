@@ -405,7 +405,7 @@ func (t *UDPv5) waitForNodes(c *callV5, distances []uint) ([]*enode.Node, error)
 			for _, record := range response.Nodes {
 				node, err := t.verifyResponseNode(c, record, distances, seen)
 				if err != nil {
-					t.log.Debug("Invalid record in "+response.Name(), "id", c.node.ID(), "err", err)
+					t.log.Info("Invalid record in "+response.Name(), "id", c.node.ID(), "err", err)
 					continue
 				}
 				nodes = append(nodes, node)
@@ -659,12 +659,12 @@ func (t *UDPv5) readLoop() {
 		nbytes, from, err := t.conn.ReadFromUDPAddrPort(buf)
 		if netutil.IsTemporaryError(err) {
 			// Ignore temporary read errors.
-			t.log.Debug("Temporary UDP read error", "err", err)
+			t.log.Info("Temporary UDP read error", "err", err)
 			continue
 		} else if err != nil {
 			// Shut down the loop for permanent errors.
 			if !errors.Is(err, io.EOF) {
-				t.log.Debug("UDP read error", "err", err)
+				t.log.Info("UDP read error", "err", err)
 			}
 			return
 		}
@@ -699,7 +699,7 @@ func (t *UDPv5) handlePacket(rawpacket []byte, fromAddr netip.AddrPort) error {
 			t.unhandled <- up
 			return nil
 		}
-		t.log.Debug("Bad discv5 packet", "id", fromID, "addr", addr, "err", err)
+		t.log.Info("Bad discv5 packet", "id", fromID, "addr", addr, "err", err)
 		return err
 	}
 	if fromNode != nil {
@@ -720,15 +720,15 @@ func (t *UDPv5) handlePacket(rawpacket []byte, fromAddr netip.AddrPort) error {
 func (t *UDPv5) handleCallResponse(fromID enode.ID, fromAddr netip.AddrPort, p v5wire.Packet) bool {
 	ac := t.activeCallByNode[fromID]
 	if ac == nil || !bytes.Equal(p.RequestID(), ac.reqid) {
-		t.log.Debug(fmt.Sprintf("Unsolicited/late %s response", p.Name()), "id", fromID, "addr", fromAddr)
+		t.log.Info(fmt.Sprintf("Unsolicited/late %s response", p.Name()), "id", fromID, "addr", fromAddr)
 		return false
 	}
 	if fromAddr != ac.addr {
-		t.log.Debug(fmt.Sprintf("%s from wrong endpoint", p.Name()), "id", fromID, "addr", fromAddr)
+		t.log.Info(fmt.Sprintf("%s from wrong endpoint", p.Name()), "id", fromID, "addr", fromAddr)
 		return false
 	}
 	if p.Kind() != ac.responseType {
-		t.log.Debug(fmt.Sprintf("Wrong discv5 response type %s", p.Name()), "id", fromID, "addr", fromAddr)
+		t.log.Info(fmt.Sprintf("Wrong discv5 response type %s", p.Name()), "id", fromID, "addr", fromAddr)
 		return false
 	}
 	t.startResponseTimeout(ac)
@@ -792,13 +792,13 @@ var (
 func (t *UDPv5) handleWhoareyou(p *v5wire.Whoareyou, fromID enode.ID, fromAddr netip.AddrPort) {
 	c, err := t.matchWithCall(fromID, p.Nonce)
 	if err != nil {
-		t.log.Debug("Invalid "+p.Name(), "addr", fromAddr, "err", err)
+		t.log.Info("Invalid "+p.Name(), "addr", fromAddr, "err", err)
 		return
 	}
 
 	if c.node == nil {
 		// Can't perform handshake because we don't have the ENR.
-		t.log.Debug("Can't handle "+p.Name(), "addr", fromAddr, "err", "call has no ENR")
+		t.log.Info("Can't handle "+p.Name(), "addr", fromAddr, "err", "call has no ENR")
 		c.err <- errors.New("remote wants handshake, but call has no ENR")
 		return
 	}

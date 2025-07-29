@@ -118,7 +118,7 @@ func (tab *Table) doRevalidate(resp revalidationResponse, node *enode.Node) {
 	if remoteSeq > node.Seq() {
 		newrec, err := tab.net.RequestENR(node)
 		if err != nil {
-			tab.log.Info("ENR request failed", "id", node.ID(), "err", err)
+			tab.log.Debug("ENR request failed", "id", node.ID(), "err", err)
 		} else {
 			resp.newRecord = newrec
 		}
@@ -162,7 +162,7 @@ func (tr *tableRevalidation) handleResponse(tab *Table, resp revalidationRespons
 		if n.livenessChecks <= 0 {
 			tab.deleteInBucket(b, n.ID())
 		} else {
-			tab.log.Info("Node revalidation failed", "b", b.index, "id", n.ID(), "checks", n.livenessChecks, "q", n.revalList.name)
+			tab.log.Debug("Node revalidation failed", "b", b.index, "id", n.ID(), "checks", n.livenessChecks, "q", n.revalList.name)
 			tr.moveToList(&tr.fast, n, now, &tab.rand)
 		}
 		return
@@ -171,7 +171,7 @@ func (tr *tableRevalidation) handleResponse(tab *Table, resp revalidationRespons
 	// The node responded.
 	n.livenessChecks++
 	n.isValidatedLive = true
-	tab.log.Info("Node revalidated", "b", b.index, "id", n.ID(), "checks", n.livenessChecks, "q", n.revalList.name)
+	tab.log.Debug("Node revalidated", "b", b.index, "id", n.ID(), "checks", n.livenessChecks, "q", n.revalList.name)
 	var endpointChanged bool
 	if resp.newRecord != nil {
 		_, endpointChanged = tab.bumpInBucket(b, resp.newRecord, false)

@@ -410,7 +410,7 @@ func (t *Trackers) tune() {
 	t.confidence = t.confidence + (1-t.confidence)/2
 
 	t.tuned = time.Now()
-	t.log.Debug("Recalculated msgrate QoS values", "rtt", t.roundtrip, "confidence", t.confidence, "ttl", t.targetTimeout(), "next", t.tuned.Add(t.roundtrip))
+	t.log.Info("Recalculated msgrate QoS values", "rtt", t.roundtrip, "confidence", t.confidence, "ttl", t.targetTimeout(), "next", t.tuned.Add(t.roundtrip))
 	if t.log.Enabled(context.Background(), log.LevelTrace) {
 		t.log.Trace("Debug dump of mean capacities", "caps", t.meanCapacities())
 	}
@@ -437,7 +437,7 @@ func (t *Trackers) detune() {
 	if t.confidence < rttMinConfidence {
 		t.confidence = rttMinConfidence
 	}
-	t.log.Debug("Relaxed msgrate QoS values", "rtt", t.roundtrip, "confidence", t.confidence, "ttl", t.targetTimeout())
+	t.log.Info("Relaxed msgrate QoS values", "rtt", t.roundtrip, "confidence", t.confidence, "ttl", t.targetTimeout())
 }
 
 // Capacity is a helper function to access a specific tracker without having to

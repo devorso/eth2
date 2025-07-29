@@ -136,7 +136,7 @@ func (c *cloudflareClient) uploadRecords(name string, records map[string]string)
 		old, exists := existing[path]
 		if !exists {
 			// Entry is unknown, push a new one to Cloudflare.
-			log.Debug(fmt.Sprintf("Creating %s = %q", path, val))
+			log.Info(fmt.Sprintf("Creating %s = %q", path, val))
 			created++
 			ttl := rootTTL
 			if path != name {
@@ -163,7 +163,7 @@ func (c *cloudflareClient) uploadRecords(name string, records map[string]string)
 			_, err = c.UpdateDNSRecord(context.Background(), cloudflare.ZoneIdentifier(c.zoneID), record)
 		} else {
 			skipped++
-			log.Debug(fmt.Sprintf("Skipping %s = %q", path, val))
+			log.Info(fmt.Sprintf("Skipping %s = %q", path, val))
 		}
 		if err != nil {
 			return fmt.Errorf("failed to publish %s: %v", path, err)
@@ -178,7 +178,7 @@ func (c *cloudflareClient) uploadRecords(name string, records map[string]string)
 			continue
 		}
 		// Stale entry, nuke it.
-		log.Debug(fmt.Sprintf("Deleting %s = %q", path, entry.Content))
+		log.Info(fmt.Sprintf("Deleting %s = %q", path, entry.Content))
 		deleted++
 		if err := c.DeleteDNSRecord(context.Background(), cloudflare.ZoneIdentifier(c.zoneID), entry.ID); err != nil {
 			return fmt.Errorf("failed to delete %s: %v", path, err)
